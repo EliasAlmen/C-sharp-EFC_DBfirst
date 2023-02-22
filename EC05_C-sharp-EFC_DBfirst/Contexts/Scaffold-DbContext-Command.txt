@@ -1,1 +1,4 @@
 ﻿PM> Scaffold-DbContext "Connection_string" Microsoft.EntityFrameworkCore.SqlServer -ContextDir Contexts -Context DataContext -OutputDit Models/Entities
+
+
+PM> Scaffold-DbContext "Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\Elias\Downloads\EC-utbildning-webbutvecklare-NET\05-Datalagring\EC05-Databases\EC05_C-sharp-EFC_DBfirst\EC05_C-sharp-EFC_DBfirst\EC05_C-sharp-EFC_DBfirst\Contexts\sql_dbfirst.mdf;Integrated Security=True;Connect Timeout=30" Microsoft.EntityFrameworkCore.SqlServer -ContextDir Contexts -Context DataContext -OutputDir Models/Entities -DataAnnotations
