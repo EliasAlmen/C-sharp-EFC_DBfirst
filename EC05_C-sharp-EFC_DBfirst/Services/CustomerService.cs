@@ -19,6 +19,7 @@ namespace EC05_C_sharp_EFC_DBfirst.Services
         {
             var _customer = new Customer
             {
+                Id = Guid.NewGuid(),
                 FirstName = model.FirstName,
                 LastName = model.LastName,
                 Email = model.Email,
@@ -60,12 +61,12 @@ namespace EC05_C_sharp_EFC_DBfirst.Services
             return _customers;
         }
 
-        public static async Task<Customer> GetAsync(string email)
+        public static async Task<CustomerModel> GetAsync(string email)
         {
             var _customer = await _context.Customers.Include(x => x.Address).FirstOrDefaultAsync(x => x.Email == email);
             if (_customer != null)
             {
-                return new Customer
+                return new CustomerModel
                 {
                     Id = _customer.Id,
                     FirstName = _customer.FirstName,
@@ -82,39 +83,45 @@ namespace EC05_C_sharp_EFC_DBfirst.Services
                 return null!;
         }
 
-        public static async Task UpdateAsync(Customer customer)
+        public static async Task UpdateAsync(CustomerModel model)
         {
-
-
-            var _customerEntity = await _context.Customers.Include(x => x.Address).FirstOrDefaultAsync(x => x.Id == customer.Id);
-            if (_customerEntity != null)
+            var _customer = await _context.Customers.Include(x => x.Address).FirstOrDefaultAsync(x => x.Id == model.Id);
+            if (_customer != null)
             {
-                if (!string.IsNullOrEmpty(customer.FirstName))
-                    _customerEntity.FirstName = customer.FirstName;
-                if (!string.IsNullOrEmpty(customer.LastName))
-                    _customerEntity.LastName = customer.LastName;
-                if (!string.IsNullOrEmpty(customer.Email))
-                    _customerEntity.Email = customer.Email;
-                if (!string.IsNullOrEmpty(customer.PhoneNumber))
-                    _customerEntity.PhoneNumber = customer.PhoneNumber;
-
-                if (!string.IsNullOrEmpty(customer.FirstName) || !string.IsNullOrEmpty(customer.PostalCode) || !string.IsNullOrEmpty(customer.City))
+                if (!string.IsNullOrEmpty(model.FirstName) || !string.IsNullOrEmpty(model.PostalCode) || !string.IsNullOrEmpty(model.City))
                 {
-                    var _addressEntity = _context.Addresses.FirstOrDefaultAsync(x => x.StreetName == customer.StreetName && x.PostalCode == customer.PostalCode && x.City == customer.City);
-                    if (_addressEntity != null)
+                    var _address = _context.Addresses.FirstOrDefaultAsync(x => x.StreetName == model.StreetName && x.PostalCode == model.PostalCode && x.City == model.City);
+                    if (_address != null)
                     {
-                        _customerEntity.AddressId = _addressEntity.Id;
+                        _customer.AddressId = _address.Id;
 
                     }
                     else
-                        _customerEntity.Address = new AddressEntity
+                    {
+                        var address_new = new Address
                         {
-                            StreetName = customer.StreetName,
-                            City = customer.City,
-                            PostalCode = customer.PostalCode,
+                            StreetName = model.StreetName,
+                            PostalCode = model.PostalCode,
+                            City = model.City,
                         };
+                        _context.Add(address_new);
+                        await _context.SaveChangesAsync();
+
+                        _customer.AddressId = address_new!.Id;
+                    }
+                        
                 }
-                _context.Update(_customerEntity);
+                if (!string.IsNullOrEmpty(model.FirstName))
+                    _customer.FirstName = model.FirstName;
+                if (!string.IsNullOrEmpty(model.LastName))
+                    _customer.LastName = model.LastName;
+                if (!string.IsNullOrEmpty(model.Email))
+                    _customer.Email = model.Email;
+                if (!string.IsNullOrEmpty(model.PhoneNumber))
+                    _customer.PhoneNumber = model.PhoneNumber;
+
+                
+                _context.Update(_customer);
                 await _context.SaveChangesAsync();
             }
         }
