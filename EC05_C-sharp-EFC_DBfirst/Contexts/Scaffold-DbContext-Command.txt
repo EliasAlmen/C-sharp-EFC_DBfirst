@@ -1,0 +1,1 @@
+﻿PM> Scaffold-DbContext "Connection_string" Microsoft.EntityFrameworkCore.SqlServer -ContextDir Contexts -Context DataContext -OutputDit Models/Entities
